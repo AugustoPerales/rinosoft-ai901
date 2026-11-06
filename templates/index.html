@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf }}">
+  <meta name="theme-color" content="#163f35">
+  <title>Rinosoft · Asistente administrativo</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+  <a class="skip" href="#workspace">Ir al espacio de trabajo</a>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="Rinosoft, inicio"><span class="brand-mark">r<span>·</span></span><span>rinosoft<span class="brand-sub">ASISTENTE ADMINISTRATIVO</span></span></a>
+    <div class="sidebar-caption">TU ESPACIO DE TRABAJO</div>
+    <nav aria-label="Tareas administrativas">
+      {% for key, task in tasks.items() %}
+      <button class="task-nav {% if loop.first %}active{% endif %}" data-task="{{ key }}" type="button" aria-pressed="{{ 'true' if loop.first else 'false' }}">
+        <span class="nav-number">0{{ loop.index }}</span><span>{{ task.tag }}</span><span class="nav-arrow" aria-hidden="true">↗</span>
+      </button>
+      {% endfor %}
+    </nav>
+    <div class="sidebar-note"><span class="small-star" aria-hidden="true">✦</span><h2>Tu criterio sigue al mando.</h2><p>Prepara un borrador, revisa los hechos y decide cómo utilizarlo.</p></div>
+    <div class="sidebar-bottom"><span class="pilot-dot"></span>Piloto con datos ficticios<span class="version">Fase 1 → aplicación</span></div>
+  </aside>
+
+  <main>
+    <header class="topbar"><span>Rinosoft <span class="slash">/</span> <strong id="breadcrumb">Correo</strong></span><span class="top-badge"><span aria-hidden="true">✦</span> IA con revisión humana</span></header>
+    <section class="intro">
+      <div><div class="eyebrow">MENOS TRABAJO REPETITIVO. MÁS CLARIDAD.</div><h1>De la información<br>al siguiente paso<span>.</span></h1><p>Ordena tus ideas y prepara documentos útiles.<br class="desktop-break"> Tú aportas el contexto. Tú revisas el resultado.</p></div>
+      <div class="intro-stamp" aria-hidden="true"><span class="stamp-rays">✳</span><span>ORGANIZAR<br>CREAR<br>REVISAR</span></div>
+    </section>
+
+    <section class="workspace" id="workspace" aria-labelledby="task-title">
+      <div class="workspace-heading"><div><span class="section-index">01 / CONTEXTO</span><h2 id="task-title">Confirmar una recepción</h2><p id="task-description">Un acuse breve, sin promesas ni acciones inventadas.</p></div><button class="sample-button" id="load-example" type="button">Usar un ejemplo <span aria-hidden="true">↗</span></button></div>
+      <div class="work-grid">
+        <form id="task-form" class="input-panel">
+          <input type="hidden" id="task" name="task" value="correo">
+          <div id="receipt-fields">
+            <label for="request-type">Tipo de solicitud recibida <span class="required">*</span></label>
+            <input id="request-type" name="request_type" maxlength="160" placeholder="Ej. actualización de datos" required>
+            <label for="client-name">Nombre del cliente <span class="optional">opcional</span></label>
+            <input id="client-name" name="client_name" maxlength="100" placeholder="Se dejará pendiente si no lo conoces">
+            <label for="sender">Remitente o área autorizada <span class="optional">opcional</span></label>
+            <input id="sender" name="sender" maxlength="120" placeholder="Se dejará pendiente si no está definido">
+            <div class="context-note"><span aria-hidden="true">↳</span><p>Confirmar recepción no significa registrar, revisar o resolver. El borrador conservará esa diferencia.</p></div>
+          </div>
+          <div id="general-fields" hidden>
+            <label for="content" id="content-label">Información de la tarea <span class="required">*</span></label>
+            <textarea id="content" name="content" maxlength="16000" rows="11" placeholder="Pega aquí información ficticia o autorizada…"></textarea>
+            <div class="text-footer"><span id="content-hint">Incluye los hechos conocidos y los datos que faltan.</span><span id="char-count">0 / 16 000</span></div>
+            <div id="source-fields"><label for="source">Nombre o versión de la fuente <span class="optional">opcional</span></label><input id="source" name="source" maxlength="150" placeholder="Ej. RIN-DOC-001 · versión 1.0"></div>
+            <div id="upload-fields"><label class="file-label" for="file"><span aria-hidden="true">＋</span><span id="file-label">Añadir un archivo</span><small>PDF de texto, TXT, MD o CSV · hasta 4 MB</small></label><input type="file" id="file" name="file" accept=".pdf,.txt,.md,.csv"><button type="button" id="remove-file" class="text-button" hidden>Quitar archivo</button></div>
+          </div>
+          <div class="input-bottom"><p class="privacy-hint">Usa datos ficticios o autorizados. Evita contraseñas, datos personales y documentos confidenciales.</p><button type="submit" class="primary-button" id="generate"><span id="generate-label">Preparar borrador</span><span class="button-arrow" aria-hidden="true">↗</span></button></div>
+          <p id="form-error" class="error" role="alert" hidden></p>
+        </form>
+
+        <section class="output-panel" aria-labelledby="output-heading" aria-busy="false" id="output-panel">
+          <div class="output-toolbar"><span class="section-index" id="output-heading">02 / BORRADOR</span><div class="output-actions"><button id="copy" class="icon-button" type="button" disabled title="Copiar resultado">Copiar</button><button id="download" class="icon-button" type="button" disabled title="Descargar como Markdown">Descargar</button></div></div>
+          <div class="output-empty" id="output-empty"><div class="empty-graphic" aria-hidden="true"><div class="paper"><span></span><span></span><span></span><i>✦</i></div></div><h3>Un buen borrador<br>empieza con tu contexto.</h3><p>Completa los datos o prueba un ejemplo.<br>El resultado aparecerá aquí.</p></div>
+          <div class="loading" id="loading" role="status" hidden><span class="spinner"></span><h3>Preparando tu borrador…</h3><p>Estamos trabajando con la información que proporcionaste.</p></div>
+          <div id="result" class="result" hidden><div class="disclosure" id="result-notice"></div><div class="result-meta"><span id="result-engine"></span><span id="result-time"></span></div><div id="result-text" class="result-text"></div><div class="source-note" id="result-source"></div></div>
+          <div class="review" id="review" hidden><span class="section-index">03 / TU REVISIÓN</span><label><input type="checkbox" id="review-facts">Contrasté los hechos, cifras y datos pendientes.</label><label><input type="checkbox" id="review-private">Revisé destinatario, tono e información sensible.</label><p id="review-status">Borrador pendiente de tu revisión.</p><small>Esta lista es una ayuda de revisión. No se guarda una aprobación corporativa ni se envía el contenido.</small></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="principles" aria-label="Criterios del piloto"><div><span>01</span><h3>Datos con contexto</h3><p>La información ausente queda pendiente.</p></div><div><span>02</span><h3>Resultados transparentes</h3><p>Se distingue la IA de los cálculos y plantillas.</p></div><div><span>03</span><h3>Responsabilidad humana</h3><p>Revisa antes de utilizar cada salida.</p></div></section>
+    <footer><span>Rinosoft · Piloto académico AI-901 · <a href="/static/Documentacion_AI901_Rinosoft.md" download>Documentación del piloto</a></span><span>Texto y documentos digitales. Voz y lectura de imágenes aún no disponibles.</span></footer>
+  </main>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>

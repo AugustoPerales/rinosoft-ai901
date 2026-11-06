@@ -1,0 +1,30 @@
+# Credenciales y configuración local
+.env
+.env.*
+!.env.example
+local.settings.json
+*.pem
+*.pfx
+*.key
+.azure/
+azure-session/
+work/
+
+# Entornos, contadores y archivos generados
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.local/
+.test-data/
+*.sqlite*
+*.log
+.python_packages/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Sistema y paquetes de despliegue
+.DS_Store
+Thumbs.db
+*.zip
